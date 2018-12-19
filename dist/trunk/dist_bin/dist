@@ -644,6 +644,9 @@ class ThreadPool(threading.Thread):
     def terminate(self):
         self.__stop = 1
 
+    def isTerminated(self):
+        return self.__stop == 1
+
 
 ##ThreadPoolTask abstract skeleton class  
 class ThreadPoolTask(threading.Thread):
@@ -679,7 +682,7 @@ class PrintQueueConsumer(ThreadPoolTask):
     def _action(self):
         last_print_time=time.time()
 
-        while not isExit and (self.p_pool.taskRunning() or printQueue.qsize()>0):
+        while not isExit and (not self.p_pool.isTerminated() or printQueue.qsize()>0):
             if not isExit and ( printQueue.qsize()>=nBufferLine or ((last_print_time+nBufferFlushTime)-time.time())<=0 ):
                 while not isExit and printQueue.qsize()>0:
                     try:
@@ -2527,18 +2530,15 @@ if __name__ == "__main__":
         pool.addTask(te, 1)
 
     pool2 = ThreadPool(5, nDelayTime, verbose=False)
-    pool2.addTask(PrintQueueConsumer(pool))
+    pool2.addTask(PrintQueueConsumer(pool2))
     pool2.start()
 
     pool.start()
     pool.terminate()
+    pool.join()
 
     pool2.terminate()
-
-    #while not pool.queueEmpty() or pool.taskRunning():
-    #while not isExit and (  ( pool and  pool.taskRunning() ) or(pool2 and pool2.taskRunning() ) ):
-    while   ( pool and  pool.taskRunning() ) or(pool2 and pool2.taskRunning() ) :
-            time.sleep(0.1)
+    pool2.join()
 
     #os.system("find /tmp/tmp.dist.* -type f -mtime +1 -exec rm -rf {} \; &> /dev/null")
     remove_tmpfiles()
