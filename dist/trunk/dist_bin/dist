@@ -200,6 +200,7 @@ printQueue = Queue()
 #printLock=threading.Lock()
 pool=None
 pool2=None
+DEVNULL = open('/dev/null', 'r+')
 
 #-------------------------------------------------------------------------
 # statistics variables
@@ -781,7 +782,7 @@ class TaskExecutor(ThreadPoolTask):
         # For flush time
         lastPrintTime=time.time()
 
-        p=Popen(strLine,shell=True,stdin=None,stdout=PIPE,stderr=PIPE,close_fds=True)
+        p=Popen(strLine,shell=True,stdin=DEVNULL,stdout=PIPE,stderr=PIPE,close_fds=False)
         dictChildPid[key]= "./%s"%(os.path.basename(self.executefile))
         (stdIn,stdOut,stdErr)=(p.stdin,p.stdout,p.stderr)
 
