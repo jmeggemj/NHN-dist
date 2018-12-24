@@ -871,7 +871,7 @@ class TaskExecutor(ThreadPoolTask):
                 break
 
 
-        del dictChildPid[key]
+        #del dictChildPid[key]
 
         if len(bufferOut)>0:
             listStdOut = listStdOut + [bufferOut]
@@ -1602,9 +1602,9 @@ def exit_program(signum, f):
     global pool
     global pool2
 
-    isExit=True
-    pool.terminate()
-    pool2.terminate()
+    #isExit=True
+    #pool.terminate()
+    #pool2.terminate()
     #print dictChildPid
     for hostname, cmdfile in dictChildPid.items():
         host = hostname[5:]
